@@ -9,12 +9,16 @@ from time import sleep
 #########################################################
 # Aquí vendrá la implementación de la lógica del bot
 
-bot_data = {}
+bot_data_propietario = {}
 class Record:
     def __init__(self):
-        self.datos = None
-        # self.weight = None
-        self.guardar = None
+        self.placa = None
+        self.tipo = None
+        self.modelo = None
+        self.marca = None
+        self.seguro = None
+        self.cantPasajeros = None
+        self.guardarPropietario = None
 
 # Enable saving next step handlers to file "./.handlers-saves/step.save".
 # Delay=2 means that after any change in next step handlers (e.g. calling register_next_step_handler())
@@ -73,8 +77,8 @@ def on_command_menu(message):
 ##################### Implementación del comando /propietario ####################################
 
 @bot.message_handler(commands=['propietario'])
-def on_command_imc(message):
-    response = bot.reply_to(message, "Digita los datos como el ejemplo: placa,tipo,modelo,marca,seguro,cantidadPasajeros")
+def on_command_propietario(message):
+    response = bot.reply_to(message, "Digita tu placa ejemplo AAA123")
     bot.register_next_step_handler(response, process_datos_step)
 
 
