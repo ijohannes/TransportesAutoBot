@@ -7,7 +7,7 @@ from telebot import types
 from time import sleep
 
 #########################################################
-# Aquí vendrá la implementación de la lógica del bot
+# Aquí vendrá la implementación de la lógica del bot AutoBot
 
 bot_data_propietario = {}
 class Record:
