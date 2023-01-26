@@ -12,13 +12,12 @@ from time import sleep
 bot_data_propietario = {}
 class Record:
     def __init__(self):
-        self.placa = None
-        self.tipo = None
-        self.modelo = None
-        self.marca = None
-        self.seguro = None
-        self.cantPasajeros = None
-        self.guardarPropietario = None
+        self.documento = None
+        self.nombresApellidos = None
+        self.fechaNac = None
+        self.celular = None
+        self.correo = None
+        self.direccion = None
 
 # Enable saving next step handlers to file "./.handlers-saves/step.save".
 # Delay=2 means that after any change in next step handlers (e.g. calling register_next_step_handler())
@@ -78,39 +77,91 @@ def on_command_menu(message):
 
 @bot.message_handler(commands=['propietario'])
 def on_command_propietario(message):
-    response = bot.reply_to(message, "Digita tu placa ejemplo AAA123")
-    bot.register_next_step_handler(response, process_datos_step)
+    response = bot.reply_to(message, "Digita tu documento")
+    bot.register_next_step_handler(response, process_documento_step)
 
 
-######################## Implementación de process_datos_step #################################
-
-def process_datos_step(message):
+######################## Implementación de process_documento_step #################################
+def process_documento_step(message):
     try:
-        datos = str(message.text)
-        record = bot_data[message.chat.id]
-        record.datos = datos
-        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-        markup.add('Guardar')
-        response = bot.reply_to(message, 'Guardar',
-        reply_markup=markup)
-        bot.register_next_step_handler(response, process_guardar_step)
+        documento = str(message.text)
+        record = Record()
+        record.documento = documento
+        bot_data_propietario[message.chat.id] = record
+        response = bot.reply_to(message, 'Digite sus nombres y apellidos')
+        bot.register_next_step_handler(response, process_nomapel_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
-######################## Implementación de process_guardar_step #################################
+######################## Implementación de process_nomapel_step #################################
+def process_nomapel_step(message):
+    try:
+        nombresApellidos = str(message.text)
+        record = bot_data_propietario[message.chat.id]
+        record.nombresApellidos = nombresApellidos
+        response = bot.reply_to(message, 'Digite su fecha de nacimiento yyyy-mm-dd')
+        bot.register_next_step_handler(response, process_fechanac_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
-def process_guardar_step(message):
-            guardar = message.text
-            record = bot_data[message.chat.id]
-            record.guardar = guardar
-            registroPropietario(message)
+######################## Implementación de process_fechanac_step #################################
+def process_fechanac_step(message):
+    try:
+        fechaNac = str(message.text)
+        record = bot_data_propietario[message.chat.id]
+        record.fechaNac = fechaNac
+        response = bot.reply_to(message, 'Digite su celular')
+        bot.register_next_step_handler(response, process_celular_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
-######################## Implementación de la función registroPropietario #################################
+######################## Implementación de process_celular_step #################################
+def process_celular_step(message):
+    try:
+        celular = str(message.text)
+        record = bot_data_propietario[message.chat.id]
+        record.celular = celular
+        response = bot.reply_to(message, 'Digite su correo')
+        bot.register_next_step_handler(response, process_correo_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+        
+######################## Implementación de process_correo_step #################################
+def process_correo_step(message):
+    try:
+        correo = str(message.text)
+        record = bot_data_propietario[message.chat.id]
+        record.correo = correo
+        response = bot.reply_to(message, 'Digite su direccion')
+        bot.register_next_step_handler(response, process_direccion_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
-def registroPropietario(message):
-    record = bot_data[message.chat.id]
-    answer = f"Registro:\n{record.datos}"
-    bot.reply_to(message, answer)
+######################## Implementación de process_direccion_step #################################
+def process_direccion_step(message):
+    try:
+        direccion = str(message.text)
+        record = bot_data_propietario[message.chat.id]
+        record.direccion = direccion
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        markup.add('Guardar')
+        response = bot.reply_to(message, 'Guardar ', reply_markup=markup)
+        bot.register_next_step_handler(response, process_info_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+######################## Implementación de mostrar datos #################################
+def process_info_step(message):
+    guardar = message.text
+    record = bot_data_propietario[message.chat.id]
+    record.guardar = guardar
+    datos(message)
+
+def datos(message):
+    record = bot_data_propietario[message.chat.id]
+    datosPropietario = f"Datos = Documento: {record.documento},\nNombres y apellidos: {record.nombresApellidos},\nFecha Nacimiento: {record.fechaNac},\nCelular: {record.celular},\nCorreo: {record.correo},\nDirección: {record.direccion}"
+    bot.reply_to(message, datosPropietario)
+
 
 ######################## Implementación del fallback #################################
 
