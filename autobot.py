@@ -1,13 +1,16 @@
 ########################importar librerias#################################
-import config
-import re
 
 from config import bot
-from telebot import types
+import config
 from time import sleep
+import re
 import logic
-
 import database.db as db
+
+#########################################################
+
+if __name__ == '__main__':
+    db.Base.metadata.create_all(db.engine)
 
 #########################################################
 # Aquí vendrá la implementación de la lógica del bot AutoBot
@@ -34,9 +37,9 @@ bot.load_next_step_handlers()
 def on_command_start(message):
     bot.send_chat_action(message.chat.id, 'typing')
     sleep(1)
-    m = bot.send_message(
+    bot.send_message(
         message.chat.id,
-        "\U0001F916 Bienvenido al bot de Transportes AutoBot",
+        logic.get_welcome_message(bot.get_me()),
         parse_mode="Markdown")
     on_command_menu(message)
     
@@ -163,7 +166,8 @@ def process_info_step(message):
 def datos(message):
     record = bot_data_propietario[message.chat.id]
     datosPropietario = f"Datos = Documento: {record.documento},\nNombres y apellidos: {record.nombresApellidos},\nFecha Nacimiento: {record.fechaNac},\nCelular: {record.celular},\nCorreo: {record.correo},\nDirección: {record.direccion}"
-    bot.reply_to(message, datosPropietario)
+    control = logic.register_propietario (message.from_user.id,{record.documento},{record.nombresApellidos},{record.fechaNac},{record.celular},{record.correo},{record.direccion})
+    # bot.reply_to(message, datosPropietario)
 
 
 ######################## Implementación del fallback #################################
