@@ -3,6 +3,7 @@
 from config import bot
 import config
 from time import sleep
+from telebot import types
 import re
 import logic
 import database.db as db
@@ -167,8 +168,8 @@ def process_info_step(message):
 def datos(message):
     record = bot_data_propietario[message.chat.id]
     datosPropietario = f"Datos = Documento: {record.documento},\nNombres y apellidos: {record.nombresApellidos},\nFecha Nacimiento: {record.fechaNac},\nCelular: {record.celular},\nCorreo: {record.correo},\nDirección: {record.direccion}"
-    control = logic.register_propietario (message.from_user.id,{record.documento},{record.nombresApellidos},{record.fechaNac},{record.celular},{record.correo},{record.direccion})
-    # bot.reply_to(message, datosPropietario)
+    control = logic.register_propietario (message.from_user.id,record.documento,record.nombresApellidos,record.fechaNac,record.celular,record.correo,record.direccion)
+    bot.reply_to(message, datosPropietario)
 
 
 ######################## Implementación del fallback #################################
