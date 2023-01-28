@@ -37,11 +37,12 @@ bot.load_next_step_handlers()
 def on_command_start(message):
     bot.send_chat_action(message.chat.id, 'typing')
     sleep(1)
-    bot.send_message(
+    m = bot.send_message(
         message.chat.id,
-        logic.get_welcome_message(bot.get_me()),
+        "\U0001F916 Bienvenido al bot de Transportes AutoBot",
         parse_mode="Markdown")
     on_command_menu(message)
+    
     
 @bot.message_handler(commands=['help'])
 def on_command_help(message):
