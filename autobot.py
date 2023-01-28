@@ -5,6 +5,9 @@ import re
 from config import bot
 from telebot import types
 from time import sleep
+import logic
+
+import database.db as db
 
 #########################################################
 # Aquí vendrá la implementación de la lógica del bot AutoBot
