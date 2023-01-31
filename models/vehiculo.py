@@ -3,8 +3,8 @@ from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKe
 from sqlalchemy.orm import relationship
 
 class Vehiculo(db.Base):
-    __tablename__ = 'Vehiculo'
     
+    __tablename__ = 'Vehiculo'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     modelo = Column('modelo', String, nullable=False)
     marca = Column('marca', String, nullable=False)
@@ -13,9 +13,10 @@ class Vehiculo(db.Base):
     cantidadpasajero = Column('cantidadpasajero', String, nullable=False)
     estado = Column('estado', String, nullable=False)
     documentopropietario = Column('documentopropietario', String, ForeignKey('Propietario.documento', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
-    documentos = relationship("Propietario", back_populates="Vehiculo")
+    propietario = relationship("Propietario", back_populates="vehiculo")
     
     def __init__(self, id, modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario):
+    # def __init__(self, id, modelo, marca, fechaseguro, placa, cantidadpasajero, estado):
         self.id = id
         self.modelo = modelo
         self.marca = marca
@@ -23,7 +24,6 @@ class Vehiculo(db.Base):
         self.placa = placa
         self.cantidadpasajero = cantidadpasajero
         self.estado = estado
-        self.documentopropietario = documentopropietario
     
     def __repr__(self):
         return f"<Vehiculo {self.id}>"

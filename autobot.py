@@ -107,21 +107,22 @@ def process_nomapel_step(message):
         nombresApellidos = str(message.text)
         record = bot_data_propietario[message.chat.id]
         record.nombresApellidos = nombresApellidos
-        response = bot.reply_to(message, 'Digite su fecha de nacimiento yyyy-mm-dd')
-        bot.register_next_step_handler(response, process_fechanac_step)
-    except Exception as e:
-        bot.reply_to(message, f"Algo terrible sucedió: {e}")
-
-######################## Implementación de process_fechanac_step #################################
-def process_fechanac_step(message):
-    try:
-        fechaNac = str(message.text)
-        record = bot_data_propietario[message.chat.id]
-        record.fechaNac = fechaNac
+        # response = bot.reply_to(message, 'Digite su fecha de nacimiento yyyy-mm-dd')
         response = bot.reply_to(message, 'Digite su celular')
         bot.register_next_step_handler(response, process_celular_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+######################## Implementación de process_fechanac_step #################################
+# def process_fechanac_step(message):
+#     try:
+#         fechaNac = str(message.text)
+#         record = bot_data_propietario[message.chat.id]
+#         record.fechaNac = fechaNac
+#         response = bot.reply_to(message, 'Digite su celular')
+#         bot.register_next_step_handler(response, process_celular_step)
+#     except Exception as e:
+#         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
 ######################## Implementación de process_celular_step #################################
 def process_celular_step(message):
@@ -162,14 +163,13 @@ def process_direccion_step(message):
 def process_info_step(message):
     guardar = message.text
     record = bot_data_propietario[message.chat.id]
-    record.guardar = guardar
     datos(message)
 
 def datos(message):
     record = bot_data_propietario[message.chat.id]
-    datosPropietario = f"Datos = Documento: {record.documento},\nNombres y apellidos: {record.nombresApellidos},\nFecha Nacimiento: {record.fechaNac},\nCelular: {record.celular},\nCorreo: {record.correo},\nDirección: {record.direccion}"
-    control = logic.register_propietario (message.from_user.id,record.documento,record.nombresApellidos,record.fechaNac,record.celular,record.correo,record.direccion)
+    datosPropietario = f"Datos = Documento: {record.documento},\nNombres y apellidos: {record.nombresApellidos},\nCelular: {record.celular},\nCorreo: {record.correo},\nDirección: {record.direccion}"
     bot.reply_to(message, datosPropietario)
+    control = logic.register_propietario(message.from_user.id,record.documento,record.nombresApellidos,record.celular,record.correo,record.direccion)
 
 
 ######################## Implementación del fallback #################################
