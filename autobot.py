@@ -7,6 +7,7 @@ from telebot import types
 import re
 import logic
 import database.db as db
+import validaciones
 
 #########################################################
 
@@ -92,16 +93,22 @@ def on_command_propietario(message):
 def process_documento_step(message):
     try:
         documento = str(message.text)
-        record = Record()
-        record.documento = documento
-        validarPropietario = logic.validarPropietario(0,record.documento)
-        if validarPropietario != None:
-            response = bot.reply_to(message, 'El propietario de documento ${documento} ya existe')
-            bot.register_next_step_handler(response, on_command_menu)
-        if validarPropietario == None:
-            bot_data_propietario[message.chat.id] = record
-            response = bot.reply_to(message, 'Digite sus nombres y apellidos')
-            bot.register_next_step_handler(response, process_nomapel_step)
+        if validaciones.contiene_solo_numeros(documento):
+            record = Record()
+            record.documento = documento
+            validarPropietario = logic.validarPropietario(0,record.documento)
+            if validarPropietario != None:
+                response = bot.reply_to(message, "El propietario de documento ${documento} ya existe")
+                bot.register_next_step_handler(response, on_command_menu)
+            if validarPropietario == None:
+                bot_data_propietario[message.chat.id] = record
+                response = bot.reply_to(message, 'Digite sus nombres y apellidos')
+                bot.register_next_step_handler(response, process_nomapel_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El número de documento solo debe contener números \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digita tu documento")
+            bot.register_next_step_handler(response, process_documento_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
@@ -133,10 +140,16 @@ def process_nomapel_step(message):
 def process_celular_step(message):
     try:
         celular = str(message.text)
-        record = bot_data_propietario[message.chat.id]
-        record.celular = celular
-        response = bot.reply_to(message, 'Digite su correo')
-        bot.register_next_step_handler(response, process_correo_step)
+        if validaciones.es_celular(celular):
+            record = bot_data_propietario[message.chat.id]
+            record.celular = celular
+            response = bot.reply_to(message, 'Digite su correo')
+            bot.register_next_step_handler(response, process_correo_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El número de celular solo debe contener 10 digitos y solo números \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digite su celular")
+            bot.register_next_step_handler(response, process_celular_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
         
@@ -144,10 +157,16 @@ def process_celular_step(message):
 def process_correo_step(message):
     try:
         correo = str(message.text)
-        record = bot_data_propietario[message.chat.id]
-        record.correo = correo
-        response = bot.reply_to(message, 'Digite su direccion')
-        bot.register_next_step_handler(response, process_direccion_step)
+        if validaciones.es_email(correo):
+            record = bot_data_propietario[message.chat.id]
+            record.correo = correo
+            response = bot.reply_to(message, 'Digite su direccion')
+            bot.register_next_step_handler(response, process_direccion_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El formato de correo no es valido \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digite su correo")
+            bot.register_next_step_handler(response, process_correo_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
