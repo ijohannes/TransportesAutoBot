@@ -4,11 +4,11 @@ from models.vehiculo import Vehiculo
 from datetime import datetime
 from sqlalchemy import extract
 
-def register_propietario(user_id,documento='',nombre='',celular='',correo='',direccion=''):
-    propietario = db.session.query(Propietario).get(user_id)
+def register_propietario(documento,nombre,celular,correo,direccion):
+    propietario = db.session.query(Propietario).filter(Propietario.documento==documento).first()
     db.session.commit()
     if propietario == None:
-        propietario = Propietario(user_id, documento, nombre, celular, correo, direccion)
+        propietario = Propietario(documento, nombre, celular, correo, direccion)
         db.session.add(propietario)
         db.session.commit()
         return True

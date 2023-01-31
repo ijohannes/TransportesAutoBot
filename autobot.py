@@ -174,7 +174,7 @@ def datos(message):
     record = bot_data_propietario[message.chat.id]
     datosPropietario = f"Datos = Documento: {record.documento},\nNombres y apellidos: {record.nombresApellidos},\nCelular: {record.celular},\nCorreo: {record.correo},\nDirección: {record.direccion}"
     bot.reply_to(message, datosPropietario)
-    control = logic.register_propietario(message.from_user.id,record.documento,record.nombresApellidos,record.celular,record.correo,record.direccion)
+    control = logic.register_propietario(record.documento,record.nombresApellidos,record.celular,record.correo,record.direccion)
 
 
 ######################## Implementación del fallback #################################
