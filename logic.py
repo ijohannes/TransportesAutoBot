@@ -14,6 +14,13 @@ def register_propietario(user_id,documento='',nombre='',celular='',correo='',dir
         return True
     return False
 
+def validarPropietario(user_id,documento):
+    propietario = db.session.query(Propietario).filter(Propietario.documento==documento).first()
+    db.session.commit()
+    if not propietario:
+        return None
+    return "{propietario.documento}"
+
 def get_welcome_message(bot_data):
     response = (
                 f"Hola, soy *{bot_data.first_name}* "

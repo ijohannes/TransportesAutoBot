@@ -88,18 +88,23 @@ def on_command_propietario(message):
     response = bot.reply_to(message, "Digita tu documento")
     bot.register_next_step_handler(response, process_documento_step)
 
-
 ######################## Implementación de process_documento_step #################################
 def process_documento_step(message):
     try:
         documento = str(message.text)
         record = Record()
         record.documento = documento
-        bot_data_propietario[message.chat.id] = record
-        response = bot.reply_to(message, 'Digite sus nombres y apellidos')
-        bot.register_next_step_handler(response, process_nomapel_step)
+        validarPropietario = logic.validarPropietario(0,record.documento)
+        if validarPropietario != None:
+            response = bot.reply_to(message, 'El propietario de documento ${documento} ya existe')
+            bot.register_next_step_handler(response, on_command_menu)
+        if validarPropietario == None:
+            bot_data_propietario[message.chat.id] = record
+            response = bot.reply_to(message, 'Digite sus nombres y apellidos')
+            bot.register_next_step_handler(response, process_nomapel_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
 
 ######################## Implementación de process_nomapel_step #################################
 def process_nomapel_step(message):
