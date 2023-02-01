@@ -14,6 +14,16 @@ def register_propietario(documento,nombre,celular,correo,direccion):
         return True
     return False
 
+def register_vehiculo(modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario):
+    vehiculo = db.session.query(Vehiculo).filter(Vehiculo.placa==placa).first()
+    db.session.commit()
+    if vehiculo == None:
+        vehiculo = Vehiculo(modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario)
+        db.session.add(vehiculo)
+        db.session.commit()
+        return True
+    return False
+    
 def validarPropietario(user_id,documento):
     propietario = db.session.query(Propietario).filter(Propietario.documento==documento).first()
     db.session.commit()

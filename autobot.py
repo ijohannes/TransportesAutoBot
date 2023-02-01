@@ -18,6 +18,7 @@ if __name__ == '__main__':
 # Aquí vendrá la implementación de la lógica del bot AutoBot
 
 bot_data_propietario = {}
+bot_data_vehiculo = {}
 class Record:
     def __init__(self):
         self.documento = None
@@ -26,6 +27,11 @@ class Record:
         self.celular = None
         self.correo = None
         self.direccion = None
+        self.placa = None        
+        self.modelo = None
+        self.marca = None
+        self.docpropietario = None
+        self.cantpasajero = None
 
 # Enable saving next step handlers to file "./.handlers-saves/step.save".
 # Delay=2 means that after any change in next step handlers (e.g. calling register_next_step_handler())
@@ -75,10 +81,11 @@ def on_command_menu(message):
     # It defines how many buttons are fit on each row before continuing on the next row.
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     itembtn1 = types.KeyboardButton('/propietario')
-    itembtn2 = types.KeyboardButton('/help')
+    itembtn2 = types.KeyboardButton('/help')    
+    itembtn3 = types.KeyboardButton('/vehiculo')
     # itembtn3 = types.KeyboardButton('/mecanico')
     
-    markup.add(itembtn1, itembtn2)
+    markup.add(itembtn1, itembtn2,itembtn3)
     
     bot.send_message(message.chat.id, "Selecciona una opción del menú:", reply_markup=markup)
     
@@ -195,6 +202,75 @@ def datos(message):
     bot.reply_to(message, datosPropietario)
     control = logic.register_propietario(record.documento,record.nombresApellidos,record.celular,record.correo,record.direccion)
 
+###############implementacion del comando vehiculo ####################
+@bot.message_handler(commands=['vehiculo'])
+def on_command_vehiculo(message):
+    response = bot.reply_to(message, "Digite la placa del vehiculo")
+    bot.register_next_step_handler(response, process_placa_step)
+
+def process_placa_step(message):
+    try:
+        placa = str(message.text)
+        record = Record()
+        record.placa = placa
+        bot_data_vehiculo[message.chat.id] = record
+        response = bot.reply_to(message, 'Digite el modelo')
+        bot.register_next_step_handler(response, process_modelo_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_modelo_step(message):
+    try:
+        modelo = str(message.text)
+        record = bot_data_vehiculo[message.chat.id]
+        record.modelo = modelo
+        response = bot.reply_to(message, 'Digite la marca')
+        bot.register_next_step_handler(response, process_marca_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_marca_step(message):
+    try:
+        marca = str(message.text)
+        record = bot_data_vehiculo[message.chat.id]
+        record.marca = marca
+        response = bot.reply_to(message, 'Digite documento del propietario')
+        bot.register_next_step_handler(response, process_docpropietario_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_docpropietario_step(message):
+    try:
+        docpropietario = str(message.text)
+        record = bot_data_vehiculo[message.chat.id]
+        record.docpropietario = docpropietario
+        response = bot.reply_to(message, 'Digite cantidad de pasajeros')
+        bot.register_next_step_handler(response, process_cantidad_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_cantidad_step(message):
+    try:
+        cantpasajero = str(message.text)
+        record = bot_data_vehiculo[message.chat.id]
+        record.cantpasajero = cantpasajero
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        markup.add('Guardar')
+        response = bot.reply_to(message, 'Guardar ', reply_markup=markup)
+        bot.register_next_step_handler(response, process_infovehiculo_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_infovehiculo_step(message):
+    guardar = message.text
+    record = bot_data_vehiculo[message.chat.id]
+    datosvehiculo(message)
+
+def datosvehiculo(message):
+    record = bot_data_vehiculo[message.chat.id]
+    datosVehiculo = f"Datos = id: {message.from_user.id} placa: {record.placa},\nmodelo: {record.modelo},\marca: {record.marca},\docu propietario: {record.docpropietario}"
+    bot.reply_to(message, datosVehiculo)
+    control = logic.register_vehiculo(record.marca,record.modelo, '2023-010-01', record.placa, record.cantpasajero, 1, record.docpropietario)
 
 ######################## Implementación del fallback #################################
 
