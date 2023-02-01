@@ -14,6 +14,16 @@ def register_propietario(user_id,documento='',nombre='',celular='',correo='',dir
         return True
     return False
 
+def register_vehiculo(modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario):
+    vehiculo = db.session.query(Vehiculo).filter(Vehiculo.placa==placa).first()
+    db.session.commit()
+    if vehiculo == None:
+        vehiculo = Vehiculo(modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario)
+        db.session.add(vehiculo)
+        db.session.commit()
+        return True
+    return False
+
 def get_welcome_message(bot_data):
     response = (
                 f"Hola, soy *{bot_data.first_name}* "

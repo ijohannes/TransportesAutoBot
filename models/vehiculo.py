@@ -15,15 +15,15 @@ class Vehiculo(db.Base):
     documentopropietario = Column('documentopropietario', String, ForeignKey('Propietario.documento', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     propietario = relationship("Propietario", back_populates="vehiculo")
     
-    def __init__(self, id, modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario):
-    # def __init__(self, id, modelo, marca, fechaseguro, placa, cantidadpasajero, estado):
-        self.id = id
+    def __init__(self, modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario):
+  
         self.modelo = modelo
         self.marca = marca
         self.fechaseguro =  fechaseguro
         self.placa = placa
         self.cantidadpasajero = cantidadpasajero
         self.estado = estado
+        self.documentopropietario = documentopropietario
     
     def __repr__(self):
         return f"<Vehiculo {self.id}>"
