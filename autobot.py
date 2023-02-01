@@ -99,7 +99,7 @@ def process_documento_step(message):
             validarPropietario = logic.validarPropietario(0,record.documento)
             if validarPropietario != None:
                 response = bot.reply_to(message, "El propietario de documento ${documento} ya existe")
-                bot.register_next_step_handler(response, on_command_menu)
+                bot.register_next_step_handler(response, on_command_menu(message))
             if validarPropietario == None:
                 bot_data_propietario[message.chat.id] = record
                 response = bot.reply_to(message, 'Digite sus nombres y apellidos')
