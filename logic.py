@@ -1,8 +1,10 @@
 import database.db as db
+import validaciones
 from models.propietario import Propietario
 from models.vehiculo import Vehiculo
 from datetime import datetime
 from sqlalchemy import extract
+import validaciones
 
 def register_propietario(documento,nombre,celular,correo,direccion):
     propietario = db.session.query(Propietario).filter(Propietario.documento==documento).first()
@@ -24,7 +26,7 @@ def register_vehiculo(modelo, marca, fechaseguro, placa, cantidadpasajero, estad
         return True
     return False
     
-def validarPropietario(user_id,documento):
+def validarPropietario(documento):
     propietario = db.session.query(Propietario).filter(Propietario.documento==documento).first()
     db.session.commit()
     if not propietario:
@@ -38,3 +40,7 @@ def get_welcome_message(bot_data):
                 "¡Estoy aquí para ayudarte en tu proceso!"
                 )
     return response
+
+def validarDocumento(documento):
+    documento = validaciones.contiene_solo_numeros(documento)
+    return documento

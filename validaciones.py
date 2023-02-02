@@ -32,7 +32,7 @@ Valida que la cadena solo contiene números
 @return boolean si contiene solo números retorna True, de lo contrario False
 '''
 def contiene_solo_numeros(cadena):
-    return True if re.match(r'^([\s\d]+)$', cadena) != None else False
+    return True if re.match(r'^([\d]+)$', cadena) != None else False
 
 '''
 Valida que la cadena solo contiene 10 números
