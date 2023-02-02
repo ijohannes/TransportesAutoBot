@@ -19,19 +19,28 @@ if __name__ == '__main__':
 
 bot_data_propietario = {}
 bot_data_vehiculo = {}
+bot_data_revision = {}
 class Record:
     def __init__(self):
         self.documento = None
         self.nombresApellidos = None
-        self.fechaNac = None
         self.celular = None
         self.correo = None
         self.direccion = None
-        self.placa = None        
+        self.placa = None
         self.modelo = None
         self.marca = None
         self.docpropietario = None
         self.cantpasajero = None
+        self.nivelLiqAceite = None
+        self.nivelLiqFrenos = None
+        self.nivelRefrigerante = None
+        self.nivelLiqDireccion = None
+        self.descripcion = None
+        self.fechaRevision = None
+        self.placaRevision = None
+        self.docMecanico = None
+        
 
 # Enable saving next step handlers to file "./.handlers-saves/step.save".
 # Delay=2 means that after any change in next step handlers (e.g. calling register_next_step_handler())
@@ -83,9 +92,10 @@ def on_command_menu(message):
     itembtn1 = types.KeyboardButton('/propietario')
     itembtn2 = types.KeyboardButton('/help')    
     itembtn3 = types.KeyboardButton('/vehiculo')
+    itembtn4 = types.KeyboardButton('/revision')
     # itembtn3 = types.KeyboardButton('/mecanico')
     
-    markup.add(itembtn1, itembtn2,itembtn3)
+    markup.add(itembtn1, itembtn2, itembtn3, itembtn4)
     
     bot.send_message(message.chat.id, "Selecciona una opción del menú:", reply_markup=markup)
     
@@ -271,6 +281,141 @@ def datosvehiculo(message):
     datosVehiculo = f"Datos = id: {message.from_user.id} placa: {record.placa},\nmodelo: {record.modelo},\marca: {record.marca},\docu propietario: {record.docpropietario}"
     bot.reply_to(message, datosVehiculo)
     control = logic.register_vehiculo(record.marca,record.modelo, '2023-010-01', record.placa, record.cantpasajero, 1, record.docpropietario)
+
+##################### Implementación del comando /revision ####################################
+
+@bot.message_handler(commands=['revision'])
+def on_command_revision(message):
+    try:
+        markup = types.ForceReply
+        markup = types.ReplyKeyboardMarkup(
+            one_time_keyboard=True, 
+            input_field_placeholder="Pulsa un botón",
+            resize_keyboard=True
+        )
+        markup.add('Alto', 'Bajo')
+        response = bot.reply_to(message, 'Nivel de aceite', reply_markup=markup)
+        bot.register_next_step_handler(response, process_nivelLiqAceite_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+
+def process_nivelLiqAceite_step(message):
+    try:
+        nivelLiqAceite = message.text
+        record = Record()
+        record.nivelLiqAceite = nivelLiqAceite
+        bot_data_revision[message.chat.id] = record
+        markup = types.ReplyKeyboardMarkup(
+            one_time_keyboard=True, 
+            input_field_placeholder="Pulsa un botón",
+            resize_keyboard=True
+        )
+        markup.add('Bajo', 'Lleno')
+        response = bot.reply_to(message, 'Nivel líquido de frenos', reply_markup=markup)
+        bot.register_next_step_handler(response, process_liquidoFrenos_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_liquidoFrenos_step(message):
+    try:
+        nivelLiqFrenos = message.text
+        record = bot_data_revision[message.chat.id]
+        record.nivelLiqFrenos = nivelLiqFrenos
+        markup = types.ReplyKeyboardMarkup(
+            one_time_keyboard=True, 
+            input_field_placeholder="Pulsa un botón",
+            resize_keyboard=True
+        )
+        markup.add('Mínimo', 'Máximo')
+        response = bot.reply_to(message, 'Nivel de refrigerante', reply_markup=markup)
+        bot.register_next_step_handler(response, process_nivelRefrigerante_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_nivelRefrigerante_step(message):
+    try:
+        nivelRefrigerante = message.text
+        record = bot_data_revision[message.chat.id]
+        record.nivelRefrigerante = nivelRefrigerante
+        markup = types.ReplyKeyboardMarkup(
+            one_time_keyboard=True, 
+            input_field_placeholder="Pulsa un botón",
+            resize_keyboard=True
+        )
+        markup.add('Mínimo', 'Máximo')
+        response = bot.reply_to(message, 'Nivel líquido de dirección', reply_markup=markup)
+        bot.register_next_step_handler(response, process_nivelLiqDireccion_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+        
+def process_nivelLiqDireccion_step(message):
+    try:
+        nivelLiqDireccion = message.text
+        record = bot_data_revision[message.chat.id]
+        record.nivelLiqDireccion = nivelLiqDireccion
+        markup = types.ReplyKeyboardMarkup(
+            one_time_keyboard=True, 
+            input_field_placeholder="Pulsa un botón",
+            resize_keyboard=True
+        )
+        response = bot.reply_to(message, 'Descripción')
+        bot.register_next_step_handler(response, process_descripcion_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_descripcion_step(message):
+    try:
+        descripcion = str(message.text)
+        record = bot_data_revision[message.chat.id]
+        record.descripcion = descripcion
+        response = bot.reply_to(message, 'Digite Fecha Revisión yyyy-mm-dd')
+        bot.register_next_step_handler(response, process_fechaRevision_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_fechaRevision_step(message):
+    try:
+        fechaRevision = str(message.text)
+        record = bot_data_revision[message.chat.id]
+        record.fechaRevision = fechaRevision
+        response = bot.reply_to(message, 'Digite Placa AAA-123')
+        bot.register_next_step_handler(response, process_placaRevision_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_placaRevision_step(message):
+    try:
+        placaRevision = str(message.text)
+        if validaciones.es_placa(placaRevision):
+            record = bot_data_revision[message.chat.id]
+            record.placaRevision = placaRevision
+            response = bot.reply_to(message, 'Digite cédula del mecánico')
+            bot.register_next_step_handler(response, process_direccion_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El formato de placa no es valido \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digite Placa ABC-123")
+            bot.register_next_step_handler(response, process_docMecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+
+def process_docMecanico_step(message):
+    try:
+        docMecanico = str(message.text)
+        if validaciones.contiene_solo_numeros(docMecanico):
+            record = bot_data_revision[message.chat.id]
+            record.docMecanico = docMecanico
+            # response = bot.reply_to(message, 'Digite cédula del mecánico')
+            # bot.register_next_step_handler(response, process_direccion_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El documento debe contener solo números \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digite cédula del mecánico")
+            bot.register_next_step_handler(response, process_docMecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
 ######################## Implementación del fallback #################################
 
