@@ -4,6 +4,7 @@ from models.propietario import Propietario
 from models.vehiculo import Vehiculo
 from datetime import datetime
 from sqlalchemy import extract
+import validaciones
 
 def register_propietario(documento,nombre,celular,correo,direccion):
     propietario = db.session.query(Propietario).filter(Propietario.documento==documento).first()
