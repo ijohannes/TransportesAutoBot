@@ -1,11 +1,11 @@
 import database.db as db
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import relationship
-
+from datetime import datetime
 
 class Revision(db.Base):
-    
     __tablename__ = 'Revision'
+    
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     nivelliqaceite = Column('nivelliqaceite', String, server_default='', nullable=False)
     nivelliqfrenos = Column('nivelliqfrenos', String, server_default='', nullable=False)
@@ -29,7 +29,7 @@ class Revision(db.Base):
         self.fecharevision = fecharevision
         self.vehiculoplaca = vehiculoplaca
         self.docmecanico = docmecanico
-        
-        
+    
+    
     def __repr__(self):
-        return f"<Revision {self.id}>"
+        return f"<Propietario {self.id}>"

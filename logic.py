@@ -3,6 +3,7 @@ import validaciones
 from models.propietario import Propietario
 from models.vehiculo import Vehiculo
 from models.mecanico import Mecanico
+from models.revision import Revision
 from datetime import datetime
 from sqlalchemy import extract
 import validaciones
@@ -56,24 +57,8 @@ def validarDocumento(documento):
     documento = validaciones.contiene_solo_numeros(documento)
     return documento
 
-
-
-
-
-
-
-
-
-
-
-
-
 def register_revision(aceite,frenos,refrigerante,direccion,descripcion,fechaRevision,placa,docMecanico):
-    revision = db.session.query(Propietario).filter(Propietario.documento==documento).first()
+    revision = Revision(aceite,frenos,refrigerante,direccion,descripcion,fechaRevision,placa,docMecanico)
+    db.session.add(revision)
     db.session.commit()
-    if propietario == None:
-        propietario = Propietario(documento, nombre, celular, correo, direccion)
-        db.session.add(propietario)
-        db.session.commit()
-        return True
-    return False
+    
