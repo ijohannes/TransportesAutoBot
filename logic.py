@@ -2,6 +2,7 @@ import database.db as db
 import validaciones
 from models.propietario import Propietario
 from models.vehiculo import Vehiculo
+from models.mecanico import Mecanico
 from datetime import datetime
 from sqlalchemy import extract
 import validaciones
@@ -32,6 +33,16 @@ def validarPropietario(documento):
     if not propietario:
         return None
     return "{propietario.documento}"
+
+def register_Mecanico(docmecanico,nommecanico,fecnacimecanico,celularmecanico,correomecanico,direccionmecanico):
+    mecanico = db.session.query(Mecanico).filter(Mecanico.documento==docmecanico).first()
+    db.session.commit()
+    if mecanico == None:
+        mecanico = Mecanico(docmecanico,nommecanico,fecnacimecanico,celularmecanico,correomecanico,direccionmecanico)
+        db.session.add(mecanico)
+        db.session.commit()
+        return True
+    return False
 
 def get_welcome_message(bot_data):
     response = (

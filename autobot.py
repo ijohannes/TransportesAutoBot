@@ -20,6 +20,7 @@ if __name__ == '__main__':
 bot_data_propietario = {}
 bot_data_vehiculo = {}
 bot_data_revision = {}
+bot_data_mecanico = {}
 class Record:
     def __init__(self):
         self.documento = None
@@ -30,6 +31,7 @@ class Record:
         self.placa = None
         self.modelo = None
         self.marca = None
+        self.fechaseguro= None
         self.docpropietario = None
         self.cantpasajero = None
         self.nivelLiqAceite = None
@@ -41,6 +43,12 @@ class Record:
         self.placaRevision = None
         self.docMecanico = None
         
+        self.docmecanico = None
+        self.nommecanico = None
+        self.fecnacimecanico = None
+        self.celularmecanico = None
+        self.correomecanico = None
+
 
 # Enable saving next step handlers to file "./.handlers-saves/step.save".
 # Delay=2 means that after any change in next step handlers (e.g. calling register_next_step_handler())
@@ -93,9 +101,9 @@ def on_command_menu(message):
     itembtn2 = types.KeyboardButton('/help')    
     itembtn3 = types.KeyboardButton('/vehiculo')
     itembtn4 = types.KeyboardButton('/revision')
-    # itembtn3 = types.KeyboardButton('/mecanico')
+    itembtn5 = types.KeyboardButton('/mecanico')
     
-    markup.add(itembtn1, itembtn2, itembtn3, itembtn4)
+    markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5)
     
     bot.send_message(message.chat.id, "Selecciona una opción del menú:", reply_markup=markup)
     
@@ -223,9 +231,15 @@ def process_placa_step(message):
         placa = str(message.text)
         record = Record()
         record.placa = placa
-        bot_data_vehiculo[message.chat.id] = record
-        response = bot.reply_to(message, 'Digite el modelo')
-        bot.register_next_step_handler(response, process_modelo_step)
+        if validaciones.es_placa(placa):
+            bot_data_vehiculo[message.chat.id] = record
+            response = bot.reply_to(message, 'Digite el modelo')
+            bot.register_next_step_handler(response, process_modelo_step)
+        else:
+            bot.send_message(
+            message.chat.id, "La placa debe ser en formato AAA123")
+            response = bot.reply_to(message, "Digite la placa del vehiculo")
+            bot.register_next_step_handler(response, process_placa_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
@@ -244,6 +258,16 @@ def process_marca_step(message):
         marca = str(message.text)
         record = bot_data_vehiculo[message.chat.id]
         record.marca = marca
+        response = bot.reply_to(message, 'Digite fecha del seguro')
+        bot.register_next_step_handler(response, process_fechaseguro_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_fechaseguro_step(message):
+    try:
+        fechaseguro = str(message.text)
+        record = bot_data_vehiculo[message.chat.id]
+        record.fechaseguro = fechaseguro
         response = bot.reply_to(message, 'Digite documento del propietario')
         bot.register_next_step_handler(response, process_docpropietario_step)
     except Exception as e:
@@ -254,10 +278,30 @@ def process_docpropietario_step(message):
         docpropietario = str(message.text)
         record = bot_data_vehiculo[message.chat.id]
         record.docpropietario = docpropietario
+        if validaciones.contiene_solo_numeros(docpropietario):
+            validarDocpropietario = logic.validarPropietario(0,record.docpropietario)
+            if validarDocpropietario != None:
+                response = bot.reply_to(message, 'Digite cantidad de pasajeros')
+                bot.register_next_step_handler(response, process_cantidad_step)
+            if validarDocpropietario == None:
+                bot_data_propietario[message.chat.id] = record
+                response = bot.reply_to(message, 'el propietario no existe')
+                bot.register_next_step_handler(response, on_command_propietario)
+        else:
+            bot.send_message(
+            message.chat.id, "El número de documento solo debe contener números \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digita tu documento")
+            bot.register_next_step_handler(response, process_documento_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+    """try:
+        docpropietario = str(message.text)
+        record = bot_data_vehiculo[message.chat.id]
+        record.docpropietario = docpropietario
         response = bot.reply_to(message, 'Digite cantidad de pasajeros')
         bot.register_next_step_handler(response, process_cantidad_step)
     except Exception as e:
-        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")"""
 
 def process_cantidad_step(message):
     try:
@@ -280,7 +324,108 @@ def datosvehiculo(message):
     record = bot_data_vehiculo[message.chat.id]
     datosVehiculo = f"Datos = id: {message.from_user.id} placa: {record.placa},\nmodelo: {record.modelo},\marca: {record.marca},\docu propietario: {record.docpropietario}"
     bot.reply_to(message, datosVehiculo)
-    control = logic.register_vehiculo(record.marca,record.modelo, '2023-010-01', record.placa, record.cantpasajero, 1, record.docpropietario)
+    control = logic.register_vehiculo(record.modelo,record.marca, record.fechaseguro, record.placa, record.cantpasajero, 1, record.docpropietario)
+
+###############implementacion del comando mecanico ####################
+@bot.message_handler(commands=['mecanico'])
+def on_command_vehiculo(message):
+    response = bot.reply_to(message, "Digite el documento del mencanico")
+    bot.register_next_step_handler(response, process_docmecanico_step)
+
+def process_docmecanico_step(message):
+    try:
+        docmecanico = str(message.text)
+        if validaciones.contiene_solo_numeros(docmecanico):
+            record = Record()
+            record.docmecanico = docmecanico
+            bot_data_mecanico[message.chat.id] = record
+            response = bot.reply_to(message, 'Digite nombres y apellidos')
+            bot.register_next_step_handler(response, process_nomapemecanico_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El número de documento solo debe contener números \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digite el documento del mencanico")
+            bot.register_next_step_handler(response, process_docmecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+
+def process_nomapemecanico_step(message):
+    try:
+        nommecanico = str(message.text)
+        record = bot_data_mecanico[message.chat.id]
+        record.nommecanico = nommecanico
+        response = bot.reply_to(message, 'Digite la fecha de nacimieto')
+        bot.register_next_step_handler(response, process_fecnacimecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_fecnacimecanico_step(message):
+    try:
+        fecnacimecanico = str(message.text)
+        record = bot_data_mecanico[message.chat.id]
+        record.fecnacimecanico = fecnacimecanico
+        response = bot.reply_to(message, 'Digite celular')
+        bot.register_next_step_handler(response, process_celularmecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_celularmecanico_step(message):
+    try:
+        celularmecanico = str(message.text)
+        if validaciones.es_celular(celularmecanico):
+            record = bot_data_mecanico[message.chat.id]
+            record.celularmecanico = celularmecanico
+            response = bot.reply_to(message, 'Digite su correo')
+            bot.register_next_step_handler(response, process_correomecanico_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El número de celular solo debe contener 10 digitos y solo números \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digite su celular")
+            bot.register_next_step_handler(response, process_celularmecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+        
+def process_correomecanico_step(message):
+    try:
+        correomecanico = str(message.text)
+        if validaciones.es_email(correomecanico):
+            record = bot_data_mecanico[message.chat.id]
+            record.correomecanico = correomecanico
+            response = bot.reply_to(message, 'Digite su direccion')
+            bot.register_next_step_handler(response, process_direccionmecanico_step)
+        else:
+            bot.send_message(
+            message.chat.id, "El formato de correo no es valido \U00002639. Te vuelvo a preguntar")
+            response = bot.reply_to(message, "Digite correo")
+            bot.register_next_step_handler(response, process_correomecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_direccionmecanico_step(message):
+    try:
+        direccionmecanico = str(message.text)
+        record = bot_data_mecanico[message.chat.id]
+        record.direccionmecanico = direccionmecanico
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        markup.add('Guardar')
+        response = bot.reply_to(message, 'Guardar ', reply_markup=markup)
+        bot.register_next_step_handler(response, process_infomecanico_step)
+    except Exception as e:
+        bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+
+def process_infomecanico_step(message):
+    guardar = message.text
+    record = bot_data_mecanico[message.chat.id]
+    datosmecanico(message)
+
+def datosmecanico(message):
+    record = bot_data_mecanico[message.chat.id]
+    datosMecanico = f"Datos = id: {message.from_user.id} doc mecanico: {record.docmecanico},\n nombre: {record.nommecanico},\nfecha nacimiento: {record.fecnacimecanico},\celular: {record.celularmecanico},\correo: {record.correomecanico},\direccion: {record.direccionmecanico}"
+    bot.reply_to(message, datosMecanico)
+    control = logic.register_Mecanico(record.docmecanico,record.nommecanico,record.fecnacimecanico,record.celularmecanico,record.correomecanico,record.direccionmecanico)
+
 
 ##################### Implementación del comando /revision ####################################
 

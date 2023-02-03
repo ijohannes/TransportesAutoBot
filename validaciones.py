@@ -24,7 +24,8 @@ Valida que la cadena es una placa
 '''
 
 def es_placa(cadena):
-    return True if re.match(r'^[A-Z]{3}[\s-][0-9]{3}$', cadena) != None else False
+    return True if re.match(r'[A-Z]{3}[0-9]{2}[A-Z0-9]', cadena) != None else False
+    #return True if re.match(r'^[A-Z]{3}[\s-][0-9]{3}$', cadena) != None else False
 
 '''
 Valida que la cadena solo contiene números
