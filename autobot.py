@@ -121,7 +121,7 @@ def process_documento_step(message):
         if validaciones.contiene_solo_numeros(documento):
             record = Record()
             record.documento = documento
-            validarPropietario = logic.validarPropietario(0,record.documento)
+            validarPropietario = logic.validarPropietario(record.documento)
             if validarPropietario != None:
                 response = bot.reply_to(message, "El propietario de documento ${documento} ya existe")
                 bot.register_next_step_handler(response, on_command_menu(message))

@@ -12,8 +12,9 @@ class Mecanico(db.Base):
     celular = Column('celular', String, nullable=False)
     correo = Column('correo', String, nullable=False)
     direccion = Column('direccion', String, nullable=False)
-    #documentopropietario = Column('documentopropietario', String, ForeignKey('Propietario.documento', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
-    #propietario = relationship("Propietario", back_populates="vehiculo")
+    
+    revision = relationship("Revision", back_populates="docMecanico")
+    
     
     def __init__(self, documento,nombre,fechanacimiento,celular,correo,direccion):
   

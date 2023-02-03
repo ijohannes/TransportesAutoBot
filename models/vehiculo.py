@@ -12,7 +12,9 @@ class Vehiculo(db.Base):
     placa = Column('placa', String, nullable=False)
     cantidadpasajero = Column('cantidadpasajero', String, nullable=False)
     estado = Column('estado', String, nullable=False)
+    
     documentopropietario = Column('documentopropietario', String, ForeignKey('Propietario.documento', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
+    
     propietario = relationship("Propietario", back_populates="vehiculo")
     revision = relationship("Revision", back_populates="vehiculo_placa")
     

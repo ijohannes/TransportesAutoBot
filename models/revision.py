@@ -1,11 +1,11 @@
 import database.db as db
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
-class Propietario(db.Base):
-    __tablename__ = 'Revision'
+
+class Revision(db.Base):
     
+    __tablename__ = 'Revision'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     nivelliqaceite = Column('nivelliqaceite', String, server_default='', nullable=False)
     nivelliqfrenos = Column('nivelliqfrenos', String, server_default='', nullable=False)
