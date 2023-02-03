@@ -44,3 +44,25 @@ def get_welcome_message(bot_data):
 def validarDocumento(documento):
     documento = validaciones.contiene_solo_numeros(documento)
     return documento
+
+
+
+
+
+
+
+
+
+
+
+
+
+def register_revision(aceite,frenos,refrigerante,direccion,descripcion,fechaRevision,placa,docMecanico):
+    revision = db.session.query(Propietario).filter(Propietario.documento==documento).first()
+    db.session.commit()
+    if propietario == None:
+        propietario = Propietario(documento, nombre, celular, correo, direccion)
+        db.session.add(propietario)
+        db.session.commit()
+        return True
+    return False

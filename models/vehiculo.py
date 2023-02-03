@@ -14,6 +14,7 @@ class Vehiculo(db.Base):
     estado = Column('estado', String, nullable=False)
     documentopropietario = Column('documentopropietario', String, ForeignKey('Propietario.documento', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     propietario = relationship("Propietario", back_populates="vehiculo")
+    revision = relationship("Revision", back_populates="vehiculo_placa")
     
     def __init__(self, modelo, marca, fechaseguro, placa, cantidadpasajero, estado, documentopropietario):
   

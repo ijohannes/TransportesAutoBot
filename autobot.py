@@ -391,12 +391,12 @@ def process_placaRevision_step(message):
             record = bot_data_revision[message.chat.id]
             record.placaRevision = placaRevision
             response = bot.reply_to(message, 'Digite cédula del mecánico')
-            bot.register_next_step_handler(response, process_direccion_step)
+            bot.register_next_step_handler(response, process_docMecanico_step)
         else:
             bot.send_message(
             message.chat.id, "El formato de placa no es valido \U00002639. Te vuelvo a preguntar")
             response = bot.reply_to(message, "Digite Placa ABC-123")
-            bot.register_next_step_handler(response, process_docMecanico_step)
+            bot.register_next_step_handler(response, process_placaRevision_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
@@ -407,8 +407,10 @@ def process_docMecanico_step(message):
         if validaciones.contiene_solo_numeros(docMecanico):
             record = bot_data_revision[message.chat.id]
             record.docMecanico = docMecanico
-            # response = bot.reply_to(message, 'Digite cédula del mecánico')
-            # bot.register_next_step_handler(response, process_direccion_step)
+            markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+            markup.add('Guardar')
+            response = bot.reply_to(message, 'Guardar ', reply_markup=markup)
+            bot.register_next_step_handler(response, process_guardarRevision_step)
         else:
             bot.send_message(
             message.chat.id, "El documento debe contener solo números \U00002639. Te vuelvo a preguntar")
@@ -416,6 +418,17 @@ def process_docMecanico_step(message):
             bot.register_next_step_handler(response, process_docMecanico_step)
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
+
+def process_guardarRevision_step(message):
+    guardar = message.text
+    record = bot_data_revision[message.chat.id]
+    datos(message)
+
+def datos(message):
+    record = bot_data_revision[message.chat.id]
+    datosRevision = f"Datos = Nivel L. Aceite: {record.nivelLiqAceite},\nNivel L. Frenos: {record.nivelLiqFrenos},\nRefrigerante: {record.nivelRefrigerante},\nNivel L. Dirección: {record.nivelLiqDireccion},\nDescripción: {record.descripcion},\nFecha Revision: {record.fechaRevision},\nPlaca: {record.placaRevision},\nMecánico: {record.docMecanico}"
+    bot.reply_to(message, datosRevision)
+    control = logic.register_revision(record.nivelLiqAceite,record.nivelLiqFrenos,record.nivelRefrigerante,record.nivelLiqDireccion,record.descripcion,record.nivelfechaRevision,record.docMecanico)
 
 ######################## Implementación del fallback #################################
 
