@@ -48,6 +48,7 @@ class Record:
         self.fecnacimecanico = None
         self.celularmecanico = None
         self.correomecanico = None
+        self.estado = None
 
 
 # Enable saving next step handlers to file "./.handlers-saves/step.save".
@@ -150,16 +151,6 @@ def process_nomapel_step(message):
     except Exception as e:
         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
-######################## Implementación de process_fechanac_step #################################
-# def process_fechanac_step(message):
-#     try:
-#         fechaNac = str(message.text)
-#         record = bot_data_propietario[message.chat.id]
-#         record.fechaNac = fechaNac
-#         response = bot.reply_to(message, 'Digite su celular')
-#         bot.register_next_step_handler(response, process_celular_step)
-#     except Exception as e:
-#         bot.reply_to(message, f"Algo terrible sucedió: {e}")
 
 ######################## Implementación de process_celular_step #################################
 def process_celular_step(message):
@@ -321,10 +312,12 @@ def process_infovehiculo_step(message):
     datosvehiculo(message)
 
 def datosvehiculo(message):
+    estado = 1
     record = bot_data_vehiculo[message.chat.id]
     datosVehiculo = f"Datos\nPlaca: {record.placa},\nModelo: {record.modelo},\nMarca: {record.marca},\nDocu propietario: {record.docpropietario},\nClic aquí para volver al menú /start"
     bot.reply_to(message, datosVehiculo)
-    control = logic.register_vehiculo(record.modelo,record.marca, record.fechaseguro, record.placa, record.cantpasajero, 1, record.docpropietario)
+    control = logic.register_vehiculo(record.modelo,record.marca, record.fechaseguro, record.placa, record.cantpasajero,
+    estado, record.docpropietario)
 
 ###############implementacion del comando mecanico ####################
 @bot.message_handler(commands=['mecanico'])
